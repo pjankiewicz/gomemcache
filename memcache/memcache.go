@@ -310,6 +310,11 @@ func (c *Client) Get(key string) (item *Item, err error) {
 	return
 }
 
+func (c *Client) Getv(key string) (string, error) {
+	it, err := c.Get(key)
+	return string(it.Value), err
+}
+
 func (c *Client) withKeyAddr(key string, fn func(net.Addr) error) (err error) {
 	if !legalKey(key) {
 		return ErrMalformedKey
@@ -444,6 +449,10 @@ func (c *Client) Set(item *Item) error {
 
 func (c *Client) set(rw *bufio.ReadWriter, item *Item) error {
 	return c.populateOne(rw, "set", item)
+}
+
+func (c *Client) Setkv(key string, val string) error {
+	return c.Set(&Item{Key: key, Value: []byte(val)})
 }
 
 // Add writes the given item, if no value already exists for its

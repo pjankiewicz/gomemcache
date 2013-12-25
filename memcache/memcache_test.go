@@ -63,7 +63,7 @@ func TestUnixSocket(t *testing.T) {
 		if _, err := os.Stat(sock); err == nil {
 			break
 		}
-		time.Sleep(time.Duration(25 * i) * time.Millisecond)
+		time.Sleep(time.Duration(25*i) * time.Millisecond)
 	}
 
 	testWithClient(t, New(sock))
@@ -82,9 +82,20 @@ func testWithClient(t *testing.T, c *Client) {
 		}
 	}
 
+	// Setkv
+	err := c.Setkv("foo", "fooval")
+	checkErr(err, "first set(foo): %v", err)
+
+	// Getv
+	s, err := c.Getv("foo")
+	checkErr(err, "get(foo): %v", err)
+	if string(s) != "fooval" {
+		t.Errorf("get(foo) Value = %q, want fooval", s)
+	}
+
 	// Set
 	foo := &Item{Key: "foo", Value: []byte("fooval"), Flags: 123}
-	err := c.Set(foo)
+	err = c.Set(foo)
 	checkErr(err, "first set(foo): %v", err)
 	err = c.Set(foo)
 	checkErr(err, "second set(foo): %v", err)
